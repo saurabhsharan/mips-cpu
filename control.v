@@ -8,7 +8,8 @@ module control (
   output reg register_write_enable,
   output reg data_mem_write_enable,
   output reg alu_b_source,
-  output reg [2:0]alu_ctrl
+  output reg [2:0]alu_ctrl,
+  output reg is_branch
 );
   always @(*) begin
     register_write_data_source = 0;
@@ -17,6 +18,7 @@ module control (
     data_mem_write_enable = 0;
     alu_b_source = 0;
     alu_ctrl = 0;
+    is_branch = 0;
 
     case (instruction[31:26])
       // R-format
@@ -32,6 +34,8 @@ module control (
           6'b100100: alu_ctrl = 3'b000;
           // or
           6'b100101: alu_ctrl = 3'b001;
+          // sub
+          6'b100010: alu_ctrl = 3'b110;
         endcase
       end
 
@@ -56,6 +60,13 @@ module control (
       6'b001100: begin
         register_write_enable = 1;
         alu_ctrl = 3'b000;
+      end
+
+      // beq
+      6'b000100: begin
+        alu_ctrl = 3'b110; // subtraction
+        alu_b_source = 1;
+        is_branch = 1;
       end
     endcase
   end

@@ -66,7 +66,7 @@ REGISTER_INDEXES = {
 @cocotb.test()
 async def fuzz_test(dut):
   count = 0
-  while count < 100:
+  while count < 15000:
     instrs = []
     for i in range(10):
       instrs.append(fuzz.generate_random_instruction())
@@ -81,21 +81,40 @@ async def fuzz_test(dut):
       model.exec_instruction(instrs[i])
       await tick(dut)
     for ri in REGISTER_INDEXES:
-      assert dut.regs.data.value[REGISTER_INDEXES[ri]] == model.registers[ri]
+      assert dut.regs.data.value[REGISTER_INDEXES[ri]].signed_integer == model.registers[ri]
     count += 1
+
+@cocotb.test()
+async def cpu_beq_test(dut):
+  instrs = [
+            "001000_01000_01000_0000000000000001", # addi $t0, $t0, 1
+            "000100_01000_01001_1111111111111110", # beq $t0, $t1, -2   this should always be skipped
+            "000100_01001_01001_1111111111111101", # beq $t1, $t1, -3
+            # "000000_01000_01001_01010_00000_100101", # or $t2, $t1, $t0
+           ]
+  await Timer(1)
+  await load_program(dut, instrs)
+  await tick(dut) # first addi
+  await tick(dut) # skipped beq
+  await tick(dut) # beq
+  await tick(dut) # second addi
+  await tick(dut) # skipped beq
+  await tick(dut) # beq
+  await tick(dut) # third addi
+  assert dut.regs.data.value[8] == 3
 
 @cocotb.test()
 async def cpu_basic_test3(dut):
   instrs = [
             "001000_01000_01000_0000000000000001", # addi $t0, $t0, 1
             "001000_01001_01001_0000000000000010", # addi $t1, $t1, 2
-            "000000_01000_01001_01010_00000_100101", # or $t2, $t1, $t0
+            "000000_01001_01000_01010_00000_100010", # sub $t2, $t1, $t0 d = s - t    t2 = t1 - t0
            ]
   await Timer(1)
   await load_program(dut, instrs)
   for _ in range(len(instrs)):
     await tick(dut)
-  assert dut.regs.data.value[10] == 3
+  assert dut.regs.data.value[10] == 1
 
 @cocotb.test()
 async def cpu_basic_test2(dut):
@@ -131,7 +150,7 @@ async def cpu_basic_test(dut):
   assert dut.s_register_addr.value == 9
   assert dut.register_read_out1.value == 0
   assert dut.immediate.value == 3
-  assert dut.alu_result_to_register_write_data.value == 3
+  assert dut.alu_result.value == 3
   assert dut.t_register_addr.value == 9
   assert dut.register_write_data_source.value == 0
   assert dut.register_write_data.value == 3

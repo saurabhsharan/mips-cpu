@@ -6,13 +6,16 @@ module cpu(input wire clk);
     pc = 0;
   end
   always @(posedge clk) begin
-    pc <= pc+4;
+    if (is_branch && (alu_result == 0))
+      pc <= pc + 4 + (immediate * 4);
+    else
+      pc <= pc+4;
   end
 
   wire [31:0] instruction;
   inst_mem imem(.i_address(pc), .instruction(instruction));
 
-  wire register_write_data_source, register_write_enable, data_mem_write_enable, alu_b_source, register_write_address_source;
+  wire register_write_data_source, register_write_enable, data_mem_write_enable, alu_b_source, register_write_address_source, is_branch;
   wire [2:0] alu_ctrl;
   control ctl(.instruction(instruction),
               .register_write_data_source(register_write_data_source),
@@ -20,15 +23,16 @@ module cpu(input wire clk);
               .register_write_address_source(register_write_address_source),
               .data_mem_write_enable(data_mem_write_enable),
               .alu_b_source(alu_b_source),
-              .alu_ctrl(alu_ctrl));
+              .alu_ctrl(alu_ctrl),
+              .is_branch(is_branch));
 
   wire [31:0] register_read_out1;
   wire [31:0] register_read_out2;
 
   // Controlled by `register_write_data_source` control signal
   wire [31:0] memory_read_output_to_register_write_data; // wire of data from memory to register write
-  wire [31:0] alu_result_to_register_write_data;
-  wire [31:0] register_write_data = register_write_data_source ? memory_read_output_to_register_write_data : alu_result_to_register_write_data;
+  wire [31:0] alu_result;
+  wire [31:0] register_write_data = register_write_data_source ? memory_read_output_to_register_write_data : alu_result;
 
   // decode the instruction to get operands
   wire [4:0] s_register_addr = instruction[25:21]; // read register from instruction to register file
@@ -46,7 +50,7 @@ module cpu(input wire clk);
                  .w_address(register_write_address), .w_data(register_write_data), .w_enable(register_write_enable),
                  .o_data1(register_read_out1), .o_data2(register_read_out2));
 
-  alu alu(.a(register_read_out1), .b(alu_b_input), .ctrl(alu_ctrl), .result(alu_result_to_register_write_data));
+  alu alu(.a(register_read_out1), .b(alu_b_input), .ctrl(alu_ctrl), .result(alu_result));
 
   data_mem dmem(.clk(clk),
                 .r_address(register_read_out1), .w_address(register_read_out1), .w_data(register_read_out2), .w_enable(data_mem_write_enable),

@@ -5,8 +5,16 @@ OP_CODES = {
   'sw': '101011',
   'addi': '001000',
   'add': '000000',
+  'sub': '000000',
   # 'or': '000000',
 }
+
+FUNCTION_CODES = {
+  'add': '100000',
+  'sub': '100010',
+  'or': '100101',
+}
+
 REGISTERS = {
   't0': '01000',
   't1': '01001',
@@ -32,6 +40,9 @@ class CPUModel:
     if instruction[0] == 'add':
       r1, r2, r3 = instruction[1], instruction[2], instruction[3]
       self.registers[r3] = self.registers[r1] + self.registers[r2]
+    if instruction[0] == 'sub':
+      r1, r2, r3 = instruction[1], instruction[2], instruction[3]
+      self.registers[r3] = self.registers[r1] - self.registers[r2]
     if instruction[0] == 'addi':
       r1, r2, immed = instruction[1], instruction[2], instruction[3]
       self.registers[r2] = self.registers[r1] + immed
@@ -44,9 +55,9 @@ def encode_instruction(instruction):
   if op == 'addi':
     r1, r2, immed = instruction[1], instruction[2], instruction[3]
     return OP_CODES[op] + REGISTERS[r1] + REGISTERS[r2] + '{0:016b}'.format(immed)
-  if op == 'add':
+  if op in ['add', 'sub', 'or']:
     r1, r2, r3 = instruction[1], instruction[2], instruction[3]
-    return OP_CODES[op] + REGISTERS[r1] + REGISTERS[r2] + REGISTERS[r3] + '00000' + '100000'
+    return OP_CODES[op] + REGISTERS[r1] + REGISTERS[r2] + REGISTERS[r3] + '00000' + FUNCTION_CODES[op]
 
 def generate_random_instruction():
   op = random.choice(list(OP_CODES.keys()))
@@ -58,9 +69,7 @@ def generate_random_instruction():
     return [op, r1, r2]
   if op == 'addi':
     return [op, r1, r2, immed]
-  if op == 'add':
-    return [op, r1, r2, r3]
-  elif op == 'or':
+  if op in ['add', 'sub', 'or']:
     return [op, r1, r2, r3]
     return OP_CODES[op] + REGISTERS[r1] + REGISTERS[r2] + REGISTERS[r3] + '00000' + '100101'
 
