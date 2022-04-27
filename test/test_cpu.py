@@ -66,15 +66,16 @@ REGISTER_INDEXES = {
 @cocotb.test()
 async def fuzz_test(dut):
   count = 0
-  while count < 1500:
+  cpu_model_cls = fuzz.MipsCPUModel
+  while count < 10:
     instrs = []
     for i in range(10):
-      instrs.append(fuzz.generate_random_instruction())
-    if fuzz.is_trivial(instrs):
+      instrs.append(cpu_model_cls.generate_random_instruction())
+    if cpu_model_cls.is_trivial(instrs):
       continue
-    encoded_instrs = [fuzz.encode_instruction(i) for i in instrs]
+    encoded_instrs = [cpu_model_cls.encode_instruction(i) for i in instrs]
     print(instrs)
-    model = fuzz.CPUModel()
+    model = cpu_model_cls()
     await Timer(1)
     await load_program(dut, encoded_instrs)
     for i in range(len(instrs)):

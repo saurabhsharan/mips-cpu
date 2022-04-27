@@ -1,5 +1,8 @@
 `default_nettype none
 
+// 32 32-bit register file. 
+// * Async reads and sync writes.
+// * 2 read ports and 1 write port.
 module registers(
   input wire clk,
   input wire [4:0]r_address1,

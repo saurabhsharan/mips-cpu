@@ -21,18 +21,18 @@ module cpu(input wire clk);
   wire [4:0] t_register_addr;
   wire [4:0] d_register_addr;
   wire [15:0] immediate;
-  control ctl(.instruction(instruction),
-              .register_write_data_source(register_write_data_source),
-              .register_write_enable(register_write_enable),
-              .register_write_address_source(register_write_address_source),
-              .data_mem_write_enable(data_mem_write_enable),
-              .alu_b_source(alu_b_source),
-              .alu_ctrl(alu_ctrl),
-              .is_branch(is_branch),
-              .src_register_addr(s_register_addr),
-              .dst_register_addr(t_register_addr),
-              .r_register_addr(d_register_addr),
-              .immediate(immediate));
+  mips_control ctl(.instruction(instruction),
+                   .register_write_data_source(register_write_data_source),
+                   .register_write_enable(register_write_enable),
+                   .register_write_address_source(register_write_address_source),
+                   .data_mem_write_enable(data_mem_write_enable),
+                   .alu_b_source(alu_b_source),
+                   .alu_ctrl(alu_ctrl),
+                   .is_branch(is_branch),
+                   .src_register_addr(s_register_addr),
+                   .dst_register_addr(t_register_addr),
+                   .r_register_addr(d_register_addr),
+                   .immediate(immediate));
 
   wire [31:0] register_read_out1;
   wire [31:0] register_read_out2;

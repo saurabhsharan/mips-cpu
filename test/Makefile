@@ -2,7 +2,7 @@ SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 RTL_DIR := $(PWD)/../rtl
 
-VERILOG_SOURCES += $(RTL_DIR)/registers.v $(RTL_DIR)/cpu.v $(RTL_DIR)/alu.v $(RTL_DIR)/data_mem.v $(RTL_DIR)/inst_mem.v $(RTL_DIR)/control.v
+VERILOG_SOURCES += $(RTL_DIR)/registers.v $(RTL_DIR)/cpu.v $(RTL_DIR)/alu.v $(RTL_DIR)/data_mem.v $(RTL_DIR)/inst_mem.v $(RTL_DIR)/mips_control.v
 # use VHDL_SOURCES for VHDL files
 
 # TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
