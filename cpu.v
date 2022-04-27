@@ -17,6 +17,10 @@ module cpu(input wire clk);
 
   wire register_write_data_source, register_write_enable, data_mem_write_enable, alu_b_source, register_write_address_source, is_branch;
   wire [2:0] alu_ctrl;
+  wire [4:0] s_register_addr;
+  wire [4:0] t_register_addr;
+  wire [4:0] d_register_addr;
+  wire [15:0] immediate;
   control ctl(.instruction(instruction),
               .register_write_data_source(register_write_data_source),
               .register_write_enable(register_write_enable),
@@ -24,7 +28,11 @@ module cpu(input wire clk);
               .data_mem_write_enable(data_mem_write_enable),
               .alu_b_source(alu_b_source),
               .alu_ctrl(alu_ctrl),
-              .is_branch(is_branch));
+              .is_branch(is_branch),
+              .src_register_addr(s_register_addr),
+              .dst_register_addr(t_register_addr),
+              .r_register_addr(d_register_addr),
+              .immediate(immediate));
 
   wire [31:0] register_read_out1;
   wire [31:0] register_read_out2;
@@ -33,13 +41,6 @@ module cpu(input wire clk);
   wire [31:0] memory_read_output_to_register_write_data; // wire of data from memory to register write
   wire [31:0] alu_result;
   wire [31:0] register_write_data = register_write_data_source ? memory_read_output_to_register_write_data : alu_result;
-
-  // decode the instruction to get operands
-  wire [4:0] s_register_addr = instruction[25:21]; // read register from instruction to register file
-  wire [4:0] t_register_addr = instruction[20:16]; // write register from instruction to register file
-  wire [4:0] d_register_addr = instruction[15:11]; // only for R-format instructions
-
-  wire [15:0] immediate = instruction[15:0];
 
   wire [31:0] alu_b_input = alu_b_source ? register_read_out2 : immediate;
 

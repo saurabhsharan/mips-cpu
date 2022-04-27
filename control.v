@@ -9,7 +9,11 @@ module control (
   output reg data_mem_write_enable,
   output reg alu_b_source,
   output reg [2:0]alu_ctrl,
-  output reg is_branch
+  output reg is_branch,
+  output reg [4:0]src_register_addr,
+  output reg [4:0]dst_register_addr,
+  output reg [4:0]r_register_addr,
+  output reg [15:0]immediate
 );
   always @(*) begin
     register_write_data_source = 0;
@@ -19,6 +23,12 @@ module control (
     alu_b_source = 0;
     alu_ctrl = 0;
     is_branch = 0;
+
+  // decode the instruction to get operands
+    src_register_addr = instruction[25:21]; // read register from instruction to register file
+    dst_register_addr = instruction[20:16]; // write register from instruction to register file
+    r_register_addr = instruction[15:11]; // only for R-format instructions
+    immediate = instruction[15:0];
 
     case (instruction[31:26])
       // R-format
