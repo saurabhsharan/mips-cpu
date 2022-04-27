@@ -66,7 +66,7 @@ REGISTER_INDEXES = {
 @cocotb.test()
 async def fuzz_test(dut):
   count = 0
-  while count < 15000:
+  while count < 1500:
     instrs = []
     for i in range(10):
       instrs.append(fuzz.generate_random_instruction())

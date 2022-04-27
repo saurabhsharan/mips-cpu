@@ -1,5 +1,6 @@
-To run cocotb tests: `make`
+To run cocotb tests: `cd test && make`
 
 To run testbench:
-`iverilog -o alu_tb alu.v alu_tb.v`
+`cd test`
+`iverilog -o alu_tb ../rtl/alu.v alu_tb.v`
 `vvp alu_tb`
