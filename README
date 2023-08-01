@@ -4,3 +4,11 @@ To run testbench:
 `cd test`
 `iverilog -o alu_tb ../rtl/alu.v alu_tb.v`
 `vvp alu_tb`
+
+To view high-level CPU wiring, start interactive `yosys` session:
+`read_verilog rtl/*.v`
+`hierarchy -check -top cpu`
+`cd cpu`
+`show -stretch -colors 3`
+Then convert .dot to .pdf (outside of yosys session):
+`dot -Tpdf ~/.yosys_show.dot -o cpu.pdf`
