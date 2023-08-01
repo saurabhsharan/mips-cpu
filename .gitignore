@@ -4,3 +4,12 @@ sim_build
 results.xml
 *.swp
 *.dot
+*.pdf
+*.out
+*.asc
+*.yslog
+*.nplog
+*.rpt
+*.dmp
+*.vim
+*.blif
