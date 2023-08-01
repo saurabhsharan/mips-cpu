@@ -12,3 +12,8 @@ To view high-level CPU wiring, start interactive `yosys` session:
 `show -stretch -colors 3`
 Then convert .dot to .pdf (outside of yosys session):
 `dot -Tpdf ~/.yosys_show.dot -o cpu.pdf`
+
+To get timing information:
+`yosys -ql cpu-icefpga.yslog -p 'synth_ice40 -top cpu -json cpu-icefpga.json' rtl/*.v`
+`nextpnr-ice40 -ql cpu-icefpga.nplog --pcf-allow-unconstrained --up5k --package sg48 --freq 12 --asc cpu-icefpga.asc --pcf icebreaker.pcf --json cpu-icefpga.json`
+`icetime -d up5k -c 12 -mtr cpu-icefpga.rpt cpu-icefpga.asc`

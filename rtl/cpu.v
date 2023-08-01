@@ -1,6 +1,6 @@
 `default_nettype none
 
-module cpu(input wire clk);
+module cpu(input wire clk, output wire [7:0] pc_out);
   reg [7:0]pc;
   initial begin
     pc = 0;
@@ -56,4 +56,6 @@ module cpu(input wire clk);
   data_mem dmem(.clk(clk),
                 .r_address(register_read_out1), .w_address(register_read_out1), .w_data(register_read_out2), .w_enable(data_mem_write_enable),
                 .o_data(memory_read_output_to_register_write_data));
+
+  assign pc_out = pc;
 endmodule
