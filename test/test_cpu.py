@@ -13,12 +13,12 @@ async def tick(dut):
 
 async def load_program(dut, instrs):
   # Reset all state
-  dut.pc.value = 0
+  dut.cpu.pc.value = 0
   for i in range(256):
     dut.dmem.data[i].value = 0
-    dut.imem.data[i].value = 0
+    dut.cpu.imem.data[i].value = 0
   for i in range(32):
-    dut.regs.data[i].value = 0
+    dut.cpu.regs.data[i].value = 0
 
   # Load program
   for i in range(len(instrs)):
@@ -29,10 +29,10 @@ async def load_program(dut, instrs):
     b2.binstr = instr_str[-16:-8]
     b3.binstr = instr_str[-24:-16]
     b4.binstr = instr_str[-32:-24]
-    dut.imem.data[(4*i)].value = b1.integer
-    dut.imem.data[(4*i)+1].value = b2.integer
-    dut.imem.data[(4*i)+2].value = b3.integer
-    dut.imem.data[(4*i)+3].value = b4.integer
+    dut.cpu.imem.data[(4*i)].value = b1.integer
+    dut.cpu.imem.data[(4*i)+1].value = b2.integer
+    dut.cpu.imem.data[(4*i)+2].value = b3.integer
+    dut.cpu.imem.data[(4*i)+3].value = b4.integer
 
   # Commit all writes
   await Timer(1)
@@ -82,7 +82,7 @@ async def fuzz_test(dut):
       model.exec_instruction(instrs[i])
       await tick(dut)
     for ri in REGISTER_INDEXES:
-      assert dut.regs.data.value[REGISTER_INDEXES[ri]].signed_integer == model.registers[ri]
+      assert dut.cpu.regs.data.value[REGISTER_INDEXES[ri]].signed_integer == model.registers[ri]
     count += 1
 
 @cocotb.test()
@@ -102,7 +102,7 @@ async def cpu_beq_test(dut):
   await tick(dut) # skipped beq
   await tick(dut) # beq
   await tick(dut) # third addi
-  assert dut.regs.data.value[8] == 3
+  assert dut.cpu.regs.data.value[8] == 3
 
 @cocotb.test()
 async def cpu_basic_test3(dut):
@@ -115,7 +115,7 @@ async def cpu_basic_test3(dut):
   await load_program(dut, instrs)
   for _ in range(len(instrs)):
     await tick(dut)
-  assert dut.regs.data.value[10] == 1
+  assert dut.cpu.regs.data.value[10] == 1
 
 @cocotb.test()
 async def cpu_basic_test2(dut):
@@ -132,9 +132,9 @@ async def cpu_basic_test2(dut):
   for _ in range(len(instrs)):
     await tick(dut)
   assert dut.dmem.data.value[1] == 3
-  assert dut.regs.data.value[8] == 1
-  assert dut.regs.data.value[9] == 7
-  assert dut.regs.data.value[10] == 8
+  assert dut.cpu.regs.data.value[8] == 1
+  assert dut.cpu.regs.data.value[9] == 7
+  assert dut.cpu.regs.data.value[10] == 8
 
 @cocotb.test()
 async def cpu_basic_test(dut):
@@ -144,20 +144,20 @@ async def cpu_basic_test(dut):
   await Timer(1)
   await load_program(dut, instrs)
 
-  assert dut.s_register_addr.value == 8, "Expected 5, got %r" % dut.s_register_addr.value
+  assert dut.cpu.s_register_addr.value == 8, "Expected 5, got %r" % dut.s_register_addr.value
   await tick(dut) # execute lw
 
-  assert dut.pc.value == 4
-  assert dut.s_register_addr.value == 9
-  assert dut.register_read_out1.value == 0
-  assert dut.immediate.value == 3
-  assert dut.alu_result.value == 3
-  assert dut.t_register_addr.value == 9
-  assert dut.register_write_data_source.value == 0
-  assert dut.register_write_data.value == 3
-  assert dut.register_write_enable.value == 1
+  assert dut.cpu.pc.value == 4
+  assert dut.cpu.s_register_addr.value == 9
+  assert dut.cpu.register_read_out1.value == 0
+  assert dut.cpu.immediate.value == 3
+  assert dut.cpu.alu_result.value == 3
+  assert dut.cpu.t_register_addr.value == 9
+  assert dut.cpu.register_write_data_source.value == 0
+  assert dut.cpu.register_write_data.value == 3
+  assert dut.cpu.register_write_enable.value == 1
   await tick(dut) # execute addi
-  assert dut.regs.data.value[9] == 3
+  assert dut.cpu.regs.data.value[9] == 3
 
   await tick(dut) # execute sw
   assert dut.dmem.data.value[0] == 3

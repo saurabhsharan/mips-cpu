@@ -1,6 +1,14 @@
 `default_nettype none
 
-module cpu(input wire clk, output wire [7:0] pc_out);
+module cpu(
+  input wire clk, 
+  input wire [31:0] mem_read_data,
+  output wire [7:0] mem_read_address,
+  output wire [7:0] mem_write_address,
+  output wire [31:0] mem_write_data,
+  output wire mem_write_enable,
+  output wire [7:0] pc_out
+);
   reg [7:0]pc;
   initial begin
     pc = 0;
@@ -37,10 +45,8 @@ module cpu(input wire clk, output wire [7:0] pc_out);
   wire [31:0] register_read_out1;
   wire [31:0] register_read_out2;
 
-  // Controlled by `register_write_data_source` control signal
-  wire [31:0] memory_read_output_to_register_write_data; // wire of data from memory to register write
   wire [31:0] alu_result;
-  wire [31:0] register_write_data = register_write_data_source ? memory_read_output_to_register_write_data : alu_result;
+  wire [31:0] register_write_data = register_write_data_source ? mem_read_data : alu_result;
 
   wire [31:0] alu_b_input = alu_b_source ? register_read_out2 : immediate;
 
@@ -53,9 +59,10 @@ module cpu(input wire clk, output wire [7:0] pc_out);
 
   alu alu(.a(register_read_out1), .b(alu_b_input), .ctrl(alu_ctrl), .result(alu_result));
 
-  data_mem dmem(.clk(clk),
-                .r_address(register_read_out1), .w_address(register_read_out1), .w_data(register_read_out2), .w_enable(data_mem_write_enable),
-                .o_data(memory_read_output_to_register_write_data));
+  assign mem_read_address = register_read_out1;
+  assign mem_write_address = register_read_out1;
+  assign mem_write_data = register_read_out2;
+  assign mem_write_enable = data_mem_write_enable;
 
   assign pc_out = pc;
 endmodule
