@@ -20,7 +20,7 @@ module icemem(
   initial begin
     for (i=0; i<255; i=i+1)
       data[i] <= 0;
-    data[255] <= 32'h0000001F;
+    // data[255] <= 32'h0000001F;
   end
 
   assign output_data = data[read_address];
