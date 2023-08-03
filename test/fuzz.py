@@ -23,6 +23,34 @@ MIPS_REGISTERS = {
   't4': '01100'
 }
 
+# riscv instructions:
+# LW rd,offset(rs1)
+# SW rs2,offset(rs1)
+# ADDI rd,rs1,imm  rd ← rs1 + sx(imm)
+# ADD rd,rs1,rs2   rd ← sx(rs1) + sx(rs2)
+# SUB rd,rs1,rs2   rd ← sx(rs1) - sx(rs2)
+
+RISCV_REGISTERS = {
+  'x5': '00101',
+  'x6': '00110',
+  'x7': '00111',
+}
+
+RISCV_OP_CODES = {
+
+}
+
+class RiscvCPUModel:
+  def __init__(self):
+    self.registers = {}
+    for r in RISCV_REGISTERS:
+      self.registers[r] = 0
+    self.data_mem = [0] * 256
+
+  @classmethod
+  def generate_random_instruction(cls):
+    pass
+
 class MipsCPUModel:
   def __init__(self):
     self.registers = {}
