@@ -13,3 +13,5 @@ results.xml
 *.dmp
 *.vim
 *.blif
+*.bin
+*.json
