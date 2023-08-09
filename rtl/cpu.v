@@ -27,7 +27,7 @@ module cpu(
 
   wire register_write_data_source, register_write_enable, data_mem_write_enable, register_write_address_source, is_branch;
   wire [2:0] alu_ctrl;
-  wire [2:0] alu_b_source;
+  wire [1:0] alu_b_source;
   wire [4:0] s_register_addr;
   wire [4:0] t_register_addr;
   wire [4:0] d_register_addr;
