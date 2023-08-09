@@ -12,11 +12,13 @@ module mips_control (
   output reg [1:0]alu_b_source,
   output reg [2:0]alu_ctrl,
   output reg is_branch,
+  output reg is_jump,
   output reg [4:0]src_register_addr,
   output reg [4:0]dst_register_addr,
   output reg [4:0]r_register_addr,
   output reg [15:0]immediate,
-  output reg [4:0]shift_amt
+  output reg [4:0]shift_amt,
+  output reg [25:0]jump_imm_addr
 );
   always @(*) begin
     register_write_data_source = 0;
@@ -26,6 +28,7 @@ module mips_control (
     alu_b_source = `MIPS_CONTROL_ALU_B_SOURCE__IMMEDIATE;
     alu_ctrl = 0;
     is_branch = 0;
+    is_jump = 0;
 
   // decode the instruction to get operands
     src_register_addr = instruction[25:21]; // read register from instruction to register file
@@ -33,6 +36,8 @@ module mips_control (
     r_register_addr = instruction[15:11]; // only for R-format instructions
     immediate = instruction[15:0];
     shift_amt = instruction[10:6]; // only for shift instructions with immediates, e.g. sll, sra
+
+    jump_imm_addr = instruction[25:0];
 
     case (instruction[31:26])
       // R-format
@@ -88,6 +93,11 @@ module mips_control (
         alu_ctrl = 3'b110; // subtraction
         alu_b_source = `MIPS_CONTROL_ALU_B_SOURCE__REGISTER_OUTPUT_2;
         is_branch = 1;
+      end
+
+      // j
+      6'b000010: begin
+        is_jump = 1;
       end
     endcase
   end

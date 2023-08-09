@@ -200,3 +200,22 @@ async def cpu_zero_register_test(dut):
   await tick(dut)
 
   assert dut.cpu.regs.data.value[REGISTER_INDEXES['zero']] == 0
+
+@cocotb.test()
+async def cpu_jump_immediate_address_test(dut):
+  assembler = MIPSAssembler()
+  instructions = assembler.assemble([
+    ['addi', '$t0', '$t0', '1'],
+    ['addi', '$t0', '$t0', '2'],
+    ['j', '1'],
+  ])
+
+  await Timer(1)
+  await load_program(dut, instructions)
+
+  await tick(dut)
+  await tick(dut)
+  await tick(dut)
+  await tick(dut)
+
+  assert dut.cpu.regs.data.value[REGISTER_INDEXES['t0']] == 5

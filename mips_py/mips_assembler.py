@@ -13,6 +13,7 @@ class MIPSAssembler:
       "lw": self.lw,
       "sw": self.sw,
       "beq": self.beq,
+      "j": self.jump,
     }
 
   def addi(self, instruction):
@@ -79,6 +80,11 @@ class MIPSAssembler:
     offset = to_twos_complement(int(instruction[3]), 16)
     return opcode + rs + rt + offset
 
+  def jump(self, instruction):
+    opcode = MIPS_OP_CODES['j']
+    addr = format(int(instruction[1]), '026b')
+    return opcode + addr
+
   def assemble(self, instructions):
     binary_output = []
     for instruction in instructions:
@@ -90,7 +96,7 @@ class MIPSAssembler:
         return None
       if len(binary_output[-1]) != 32:
         print(instruction)
-        raise Exception('Internal assembler error')
+        raise Exception('Internal assembler error: expected length 32, got length %d' % len(binary_output[-1]))
     return binary_output
 
   def save_to_file(self, binary_output, filename):

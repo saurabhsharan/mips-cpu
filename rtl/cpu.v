@@ -18,6 +18,8 @@ module cpu(
   always @(posedge clk) begin
     if (is_branch && (alu_result == 0))
       pc <= pc + 4 + (immediate * 4);
+    else if (is_jump)
+      pc <= (jump_imm_addr[7:0] << 2);
     else
       pc <= pc+4;
   end
@@ -25,7 +27,7 @@ module cpu(
   wire [31:0] instruction;
   inst_mem imem(.i_address(pc), .instruction(instruction));
 
-  wire register_write_data_source, register_write_enable, data_mem_write_enable, register_write_address_source, is_branch;
+  wire register_write_data_source, register_write_enable, data_mem_write_enable, register_write_address_source, is_branch, is_jump;
   wire [2:0] alu_ctrl;
   wire [1:0] alu_b_source;
   wire [4:0] s_register_addr;
@@ -33,6 +35,7 @@ module cpu(
   wire [4:0] d_register_addr;
   wire [15:0] immediate;
   wire [4:0] shift_amt;
+  wire [25:0] jump_imm_addr;
   mips_control ctl(.instruction(instruction),
                    .register_write_data_source(register_write_data_source),
                    .register_write_enable(register_write_enable),
@@ -41,11 +44,13 @@ module cpu(
                    .alu_b_source(alu_b_source),
                    .alu_ctrl(alu_ctrl),
                    .is_branch(is_branch),
+                   .is_jump(is_jump),
                    .src_register_addr(s_register_addr),
                    .dst_register_addr(t_register_addr),
                    .r_register_addr(d_register_addr),
                    .immediate(immediate),
-                   .shift_amt(shift_amt));
+                   .shift_amt(shift_amt),
+                   .jump_imm_addr(jump_imm_addr));
 
   wire [31:0] register_read_out1;
   wire [31:0] register_read_out2;

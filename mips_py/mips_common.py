@@ -3,6 +3,7 @@ MIPS_OP_CODES = {
   'sw': '101011',
   'addi': '001000',
   'beq': '000100',
+  'j': '000010',
 
   # all R-type instructions have opcode 0
   'add': '000000',

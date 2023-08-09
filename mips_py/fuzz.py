@@ -69,7 +69,7 @@ class MipsCPUModel:
 
   @classmethod
   def generate_random_instruction(cls):
-    op_codes = [k for k in MIPS_OP_CODES.keys() if k not in set(['beq', 'sll'])]
+    op_codes = [k for k in MIPS_OP_CODES.keys() if k not in set(['beq', 'sll', 'j'])]
     registers = [k for k in MIPS_REGISTERS.keys() if k not in set(['zero'])]
     op = random.choice(op_codes)
     r1 = random.choice(registers)
