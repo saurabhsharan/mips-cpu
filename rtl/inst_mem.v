@@ -26,7 +26,7 @@ module inst_mem(
 
     $readmemb("i1.mem", data);
 
-    for (i=12; i<256; i=i+1)
+    for (i=28; i<256; i=i+1)
       data[i] <= 0;
   end
 

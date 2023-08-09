@@ -46,7 +46,7 @@ class MIPSAssembler:
   def sll(self, instruction):
     # sll $rd, $rt, shamt
     opcode = MIPS_OP_CODES['sll']
-    rs = '000000' # always 0 for sll
+    rs = '00000' # always 0 for sll
     rt = MIPS_REGISTERS[instruction[2][1:]]
     rd = MIPS_REGISTERS[instruction[1][1:]]
     # Note that shamt is NOT 2's complement encoded since it can't be negative
@@ -88,6 +88,9 @@ class MIPSAssembler:
       else:
         print(f"Error: Unsupported instruction {opcode}")
         return None
+      if len(binary_output[-1]) != 32:
+        print(instruction)
+        raise Exception('Internal assembler error')
     return binary_output
 
   def save_to_file(self, binary_output, filename):
