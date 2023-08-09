@@ -1,5 +1,7 @@
 `default_nettype none
 
+`include "constants.vh"
+
 module mips_control (
   input wire [31:0]instruction,
   // these are marked `reg` so I can assign to them from an always @(*) block
@@ -7,20 +9,21 @@ module mips_control (
   output reg register_write_address_source,
   output reg register_write_enable,
   output reg data_mem_write_enable,
-  output reg alu_b_source,
+  output reg [1:0]alu_b_source,
   output reg [2:0]alu_ctrl,
   output reg is_branch,
   output reg [4:0]src_register_addr,
   output reg [4:0]dst_register_addr,
   output reg [4:0]r_register_addr,
-  output reg [15:0]immediate
+  output reg [15:0]immediate,
+  output reg [4:0]shift_amt
 );
   always @(*) begin
     register_write_data_source = 0;
     register_write_address_source = 0;
     register_write_enable = 0;
     data_mem_write_enable = 0;
-    alu_b_source = 0;
+    alu_b_source = `MIPS_CONTROL_ALU_B_SOURCE__IMMEDIATE;
     alu_ctrl = 0;
     is_branch = 0;
 
@@ -29,11 +32,12 @@ module mips_control (
     dst_register_addr = instruction[20:16]; // write register from instruction to register file
     r_register_addr = instruction[15:11]; // only for R-format instructions
     immediate = instruction[15:0];
+    shift_amt = instruction[10:6]; // only for shift instructions with immediates, e.g. sll, sra
 
     case (instruction[31:26])
       // R-format
       6'b000000: begin
-        alu_b_source = 1;
+        alu_b_source = `MIPS_CONTROL_ALU_B_SOURCE__REGISTER_OUTPUT_2;
         register_write_enable = 1;
         register_write_address_source = 1;
 
@@ -46,6 +50,13 @@ module mips_control (
           6'b100101: alu_ctrl = 3'b001;
           // sub
           6'b100010: alu_ctrl = 3'b110;
+          // sll
+          6'b000000: begin
+            src_register_addr = instruction[20:16];
+            dst_register_addr = instruction[15:11];
+            alu_b_source = `MIPS_CONTROL_ALU_B_SOURCE__SHIFT_IMMEDIATE;
+            alu_ctrl = 3'b011;
+          end
         endcase
       end
 

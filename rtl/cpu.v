@@ -1,5 +1,7 @@
 `default_nettype none
 
+`include "constants.vh"
+
 module cpu(
   input wire clk, 
   input wire [31:0] mem_read_data,
@@ -23,12 +25,14 @@ module cpu(
   wire [31:0] instruction;
   inst_mem imem(.i_address(pc), .instruction(instruction));
 
-  wire register_write_data_source, register_write_enable, data_mem_write_enable, alu_b_source, register_write_address_source, is_branch;
+  wire register_write_data_source, register_write_enable, data_mem_write_enable, register_write_address_source, is_branch;
   wire [2:0] alu_ctrl;
+  wire [2:0] alu_b_source;
   wire [4:0] s_register_addr;
   wire [4:0] t_register_addr;
   wire [4:0] d_register_addr;
   wire [15:0] immediate;
+  wire [4:0] shift_amt;
   mips_control ctl(.instruction(instruction),
                    .register_write_data_source(register_write_data_source),
                    .register_write_enable(register_write_enable),
@@ -40,7 +44,8 @@ module cpu(
                    .src_register_addr(s_register_addr),
                    .dst_register_addr(t_register_addr),
                    .r_register_addr(d_register_addr),
-                   .immediate(immediate));
+                   .immediate(immediate),
+                   .shift_amt(shift_amt));
 
   wire [31:0] register_read_out1;
   wire [31:0] register_read_out2;
@@ -48,7 +53,15 @@ module cpu(
   wire [31:0] alu_result;
   wire [31:0] register_write_data = register_write_data_source ? mem_read_data : alu_result;
 
-  wire [31:0] alu_b_input = alu_b_source ? register_read_out2 : immediate;
+  reg [31:0] alu_b_input;
+  always @(*) begin
+    case (alu_b_source)
+      `MIPS_CONTROL_ALU_B_SOURCE__IMMEDIATE: alu_b_input = immediate;
+      `MIPS_CONTROL_ALU_B_SOURCE__REGISTER_OUTPUT_2: alu_b_input = register_read_out2;
+      `MIPS_CONTROL_ALU_B_SOURCE__SHIFT_IMMEDIATE: alu_b_input = shift_amt;
+      default: alu_b_input = immediate;
+    endcase
+  end
 
   wire [4:0] register_write_address = register_write_address_source ? d_register_addr : t_register_addr;
 

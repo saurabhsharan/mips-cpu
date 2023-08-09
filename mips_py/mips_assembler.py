@@ -1,22 +1,32 @@
-from mips_common import MIPS_OP_CODES, MIPS_REGISTERS
+from mips_common import MIPS_OP_CODES, MIPS_REGISTERS, MIPS_FUNCTION_CODES, to_twos_complement
 
 class MIPSAssembler:
   def __init__(self):
     self.instruction_set = {
       "addi": self.addi,
+      "sll": self.sll,
       "sw": self.sw,
       "beq": self.beq,
-      # Add more instruction handlers here
     }
 
   def addi(self, instruction):
+    # addi $rt, $rs, imm
     opcode = MIPS_OP_CODES['addi']
-    # rs = format(int(instruction[1][1:]), '05b')  # source register
-    # rt = format(int(instruction[2][1:]), '05b')  # target register
-    rs = MIPS_REGISTERS[instruction[1][1:]]
-    rt = MIPS_REGISTERS[instruction[2][1:]]
-    immediate = format(int(instruction[3]), '016b')
+    rt = MIPS_REGISTERS[instruction[1][1:]]
+    rs = MIPS_REGISTERS[instruction[2][1:]]
+    immediate = to_twos_complement(int(instruction[3]), 16)
     return opcode + rs + rt + immediate
+
+  def sll(self, instruction):
+    # sll $rd, $rt, shamt
+    opcode = MIPS_OP_CODES['sll']
+    rs = '000000' # always 0 for sll
+    rt = MIPS_REGISTERS[instruction[2][1:]]
+    rd = MIPS_REGISTERS[instruction[1][1:]]
+    # Note that shamt is NOT 2's complement encoded since it can't be negative
+    shamt = format(int(instruction[3]) & 0x1F, '05b')
+    funct = MIPS_FUNCTION_CODES['sll']
+    return opcode + rs + rt + rd + shamt + funct
 
   def parse_offset_base(self, offset_base_str):
     offset_base = offset_base_str.split('(')

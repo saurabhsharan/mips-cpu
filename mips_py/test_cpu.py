@@ -3,6 +3,7 @@ from cocotb.triggers import Timer
 from cocotb.binary import BinaryValue
 
 import fuzz
+from mips_assembler import MIPSAssembler
 
 async def tick(dut):
   await Timer(1)
@@ -161,3 +162,20 @@ async def cpu_basic_test(dut):
 
   await tick(dut) # execute sw
   assert dut.dmem.data.value[0] == 3
+
+@cocotb.test()
+async def cpu_sll_test(dut):
+  assembler = MIPSAssembler()
+  instructions = assembler.assemble([
+    ['addi', '$t0', '$t0', '2'],
+    ['sll', '$t1', '$t0', '1'],
+  ])
+
+  await Timer(1)
+  await load_program(dut, instructions)
+
+  await tick(dut)
+  await tick(dut)
+
+  assert dut.cpu.regs.data.value[REGISTER_INDEXES['t0']] == 2
+  assert dut.cpu.regs.data.value[REGISTER_INDEXES['t1']] == 4
