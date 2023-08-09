@@ -6,9 +6,12 @@ module alu_tb;
   alu alu1(.a(a), .b(b), .ctrl(ctrl), .result(result));
 
   initial begin
-    a = 3;
-    b = 4;
-    ctrl = 3'b010;
+    a = 2;
+    b = 1;
+    ctrl = 3'b011;
+
+    $dumpfile("alu_tb.dmp");
+    $dumpvars;
 
     #1 $display("result=%d", result);
     $finish;
