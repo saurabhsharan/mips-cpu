@@ -4,7 +4,10 @@ class MIPSAssembler:
   def __init__(self):
     self.instruction_set = {
       "addi": self.addi,
+      "add": self.add,
+      "sub": self.sub,
       "sll": self.sll,
+      "lw": self.lw,
       "sw": self.sw,
       "beq": self.beq,
     }
@@ -16,6 +19,26 @@ class MIPSAssembler:
     rs = MIPS_REGISTERS[instruction[2][1:]]
     immediate = to_twos_complement(int(instruction[3]), 16)
     return opcode + rs + rt + immediate
+
+  def add(self, instruction):
+    # add $rd, $rs, $rt
+    opcode = MIPS_OP_CODES['add']
+    rd = MIPS_REGISTERS[instruction[1][1:]]
+    rs = MIPS_REGISTERS[instruction[2][1:]]
+    rt = MIPS_REGISTERS[instruction[3][1:]]
+    shamt = '00000'
+    funct = MIPS_FUNCTION_CODES['add']
+    return opcode + rs + rt + rd + shamt + funct
+
+  def sub(self, instruction):
+    # sub $rd, $rs, $rt
+    opcode = MIPS_OP_CODES['sub']
+    rd = MIPS_REGISTERS[instruction[1][1:]]
+    rs = MIPS_REGISTERS[instruction[2][1:]]
+    rt = MIPS_REGISTERS[instruction[3][1:]]
+    shamt = '00000'
+    funct = MIPS_FUNCTION_CODES['sub']
+    return opcode + rs + rt + rd + shamt + funct
 
   def sll(self, instruction):
     # sll $rd, $rt, shamt
@@ -31,8 +54,14 @@ class MIPSAssembler:
   def parse_offset_base(self, offset_base_str):
     offset_base = offset_base_str.split('(')
     offset = format(int(offset_base[0]) & 0xFFFF, '016b')
-    base = format(int(offset_base[1][1:-1]), '05b')
+    base = MIPS_REGISTERS[offset_base[1][1:-1]]
     return offset, base
+
+  def lw(self, instruction):
+    opcode = MIPS_OP_CODES['lw']
+    rt = MIPS_REGISTERS[instruction[1][1:]]
+    offset, base = self.parse_offset_base(instruction[2])
+    return opcode + base + rt + offset
 
   def sw(self, instruction):
     opcode = MIPS_OP_CODES['sw']
@@ -42,9 +71,9 @@ class MIPSAssembler:
 
   def beq(self, instruction):
     opcode = MIPS_OP_CODES['beq']
-    rs = MIPS_REGISTERS[instruction[1][1:]]
-    rt = MIPS_REGISTERS[instruction[2][1:]]
-    offset = format(int(instruction[3]) & 0xFFFF, '016b')
+    rt = MIPS_REGISTERS[instruction[1][1:]]
+    rs = MIPS_REGISTERS[instruction[2][1:]]
+    offset = to_twos_complement(int(instruction[3]), 16)
     return opcode + rs + rt + offset
 
   # Add more instruction encoding functions here

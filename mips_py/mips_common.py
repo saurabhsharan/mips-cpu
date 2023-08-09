@@ -23,7 +23,7 @@ MIPS_REGISTERS = {
   't1': '01001',
   't2': '01010',
   't3': '01011',
-  't4': '01100'
+  't4': '01100',
 }
 
 def to_twos_complement(value, bits):

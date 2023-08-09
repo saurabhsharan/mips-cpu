@@ -88,14 +88,14 @@ async def fuzz_test(dut):
 
 @cocotb.test()
 async def cpu_beq_test(dut):
-  instrs = [
-            "001000_01000_01000_0000000000000001", # addi $t0, $t0, 1
-            "000100_01000_01001_1111111111111110", # beq $t0, $t1, -2   this should always be skipped
-            "000100_01001_01001_1111111111111101", # beq $t1, $t1, -3
-            # "000000_01000_01001_01010_00000_100101", # or $t2, $t1, $t0
-           ]
+  assembler = MIPSAssembler()
+  instructions = assembler.assemble([
+    ['addi', '$t0', '$t0', '1'],
+    ['beq', '$t0', '$t1', '-2'], # this should always be skipped
+    ['beq', '$t1', '$t1', '-3'],
+  ])
   await Timer(1)
-  await load_program(dut, instrs)
+  await load_program(dut, instructions)
   await tick(dut) # first addi
   await tick(dut) # skipped beq
   await tick(dut) # beq
@@ -107,30 +107,32 @@ async def cpu_beq_test(dut):
 
 @cocotb.test()
 async def cpu_basic_test3(dut):
-  instrs = [
-            "001000_01000_01000_0000000000000001", # addi $t0, $t0, 1
-            "001000_01001_01001_0000000000000010", # addi $t1, $t1, 2
-            "000000_01001_01000_01010_00000_100010", # sub $t2, $t1, $t0 d = s - t    t2 = t1 - t0
-           ]
+  assembler = MIPSAssembler()
+  instructions = assembler.assemble([
+    ['addi', '$t0', '$t0', '1'],
+    ['addi', '$t1', '$t1', '2'],
+    ['sub', '$t2', '$t1', '$t0'],
+  ])
   await Timer(1)
-  await load_program(dut, instrs)
-  for _ in range(len(instrs)):
+  await load_program(dut, instructions)
+  for _ in range(len(instructions)):
     await tick(dut)
   assert dut.cpu.regs.data.value[10] == 1
 
 @cocotb.test()
 async def cpu_basic_test2(dut):
-  instrs = [
-            "001000_01000_01000_0000000000000001", # addi $t0, $t0, 1
-            "100011_01000_01001_0000000000000000", # lw $t1, $t0
-            "001000_01001_01001_0000000000000011", # addi $t1, $t1, 3
-            "101011_01000_01001_0000000000000000", # sw $t1, t0
-            "001000_01001_01001_0000000000000100", # addi $t1, $t1, 4
-            "000000_01000_01001_01010_00000_100000", # add $t2, $t0, $t1
-           ]
+  assembler = MIPSAssembler()
+  instructions = assembler.assemble([
+    ['addi', '$t0', '$t0', '1'],
+    ['lw', '$t1', '0($t0)'],
+    ['addi', '$t1', '$t1', '3'],
+    ['sw', '$t1', '0($t0)'],
+    ['addi', '$t1', '$t1', '4'],
+    ['add', '$t2', '$t0', '$t1'],
+  ])
   await Timer(1)
-  await load_program(dut, instrs)
-  for _ in range(len(instrs)):
+  await load_program(dut, instructions)
+  for _ in range(len(instructions)):
     await tick(dut)
   assert dut.dmem.data.value[1] == 3
   assert dut.cpu.regs.data.value[8] == 1
@@ -139,11 +141,14 @@ async def cpu_basic_test2(dut):
 
 @cocotb.test()
 async def cpu_basic_test(dut):
-  instrs = ["100011_01000_01001_0000000000000000", # lw $t1, $t0
-            "001000_01001_01001_0000000000000011", # addi $t1, $t1, 3
-            "101011_01000_01001_0000000000000000"] # sw $t1, t0
+  assembler = MIPSAssembler()
+  instructions = assembler.assemble([
+    ['lw', '$t1', '0($t0)'],
+    ['addi', '$t1', '$t1', '3'],
+    ['sw', '$t1', '0($t0)'],
+  ])
   await Timer(1)
-  await load_program(dut, instrs)
+  await load_program(dut, instructions)
 
   assert dut.cpu.s_register_addr.value == 8, "Expected 5, got %r" % dut.s_register_addr.value
   await tick(dut) # execute lw
