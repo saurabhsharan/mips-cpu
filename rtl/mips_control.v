@@ -86,7 +86,7 @@ module mips_control (
       // beq
       6'b000100: begin
         alu_ctrl = 3'b110; // subtraction
-        alu_b_source = 1;
+        alu_b_source = `MIPS_CONTROL_ALU_B_SOURCE__REGISTER_OUTPUT_2;
         is_branch = 1;
       end
     endcase
