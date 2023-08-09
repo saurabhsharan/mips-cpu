@@ -74,7 +74,7 @@ async def fuzz_test(dut):
     if cpu_model_cls.is_trivial(instrs):
       continue
     encoded_instrs = [cpu_model_cls.encode_instruction(i) for i in instrs]
-    print(instrs)
+    # print(instrs)
     model = cpu_model_cls()
     await Timer(1)
     await load_program(dut, encoded_instrs)

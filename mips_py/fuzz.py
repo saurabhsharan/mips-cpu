@@ -1,27 +1,6 @@
 import random
 
-MIPS_OP_CODES = {
-  'lw': '100011',
-  'sw': '101011',
-  'addi': '001000',
-  'add': '000000',
-  'sub': '000000',
-  # 'or': '000000',
-}
-
-MIPS_FUNCTION_CODES = {
-  'add': '100000',
-  'sub': '100010',
-  'or': '100101',
-}
-
-MIPS_REGISTERS = {
-  't0': '01000',
-  't1': '01001',
-  't2': '01010',
-  't3': '01011',
-  't4': '01100'
-}
+from mips_common import MIPS_OP_CODES, MIPS_FUNCTION_CODES, MIPS_REGISTERS
 
 # riscv instructions:
 # LW rd,offset(rs1)
@@ -90,7 +69,7 @@ class MipsCPUModel:
 
   @classmethod
   def generate_random_instruction(cls):
-    op = random.choice(list(MIPS_OP_CODES.keys()))
+    op = random.choice([k for k in MIPS_OP_CODES.keys() if k not in set(['beq'])])
     r1 = random.choice(list(MIPS_REGISTERS.keys()))
     r2 = random.choice(list(MIPS_REGISTERS.keys()))
     r3 = random.choice(list(MIPS_REGISTERS.keys()))

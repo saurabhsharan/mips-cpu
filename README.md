@@ -1,5 +1,5 @@
 To run cocotb tests: \
-`cd test && make`
+`cd mips_py && make -f Makefile.cocotb`
 
 To run testbench: \
 `cd test` \
