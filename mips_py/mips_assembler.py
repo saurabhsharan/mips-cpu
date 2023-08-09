@@ -1,5 +1,8 @@
 from mips_common import MIPS_OP_CODES, MIPS_REGISTERS, MIPS_FUNCTION_CODES, to_twos_complement
 
+# TODO:
+#  - Throw error if assembly code tries to write value to $zero
+
 class MIPSAssembler:
   def __init__(self):
     self.instruction_set = {
@@ -76,7 +79,6 @@ class MIPSAssembler:
     offset = to_twos_complement(int(instruction[3]), 16)
     return opcode + rs + rt + offset
 
-  # Add more instruction encoding functions here
   def assemble(self, instructions):
     binary_output = []
     for instruction in instructions:

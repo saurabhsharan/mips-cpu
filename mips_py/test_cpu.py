@@ -39,6 +39,7 @@ async def load_program(dut, instrs):
   await Timer(1)
 
 REGISTER_INDEXES = {
+  'zero': 0,
   't0': 8,
   't1': 9,
   't2': 10,
@@ -83,7 +84,7 @@ async def fuzz_test(dut):
       model.exec_instruction(instrs[i])
       await tick(dut)
     for ri in REGISTER_INDEXES:
-      assert dut.cpu.regs.data.value[REGISTER_INDEXES[ri]].signed_integer == model.registers[ri]
+      assert dut.cpu.regs.data.value[REGISTER_INDEXES[ri]].signed_integer == model.registers[ri], f"Error for register index {ri}"
     count += 1
 
 @cocotb.test()
@@ -184,3 +185,18 @@ async def cpu_sll_test(dut):
 
   assert dut.cpu.regs.data.value[REGISTER_INDEXES['t0']] == 2
   assert dut.cpu.regs.data.value[REGISTER_INDEXES['t1']] == 4
+
+@cocotb.test()
+async def cpu_zero_register_test(dut):
+  """Verify that writing to register $zero is a no-op"""
+  assembler = MIPSAssembler()
+  instructions = assembler.assemble([
+    ['addi', '$zero', '$zero', '2'],
+  ])
+
+  await Timer(1)
+  await load_program(dut, instructions)
+
+  await tick(dut)
+
+  assert dut.cpu.regs.data.value[REGISTER_INDEXES['zero']] == 0

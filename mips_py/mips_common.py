@@ -19,6 +19,7 @@ MIPS_FUNCTION_CODES = {
 }
 
 MIPS_REGISTERS = {
+  'zero': '00000',
   't0': '01000',
   't1': '01001',
   't2': '01010',

@@ -25,7 +25,7 @@ module registers(
   assign o_data2 = data[r_address2];
 
   always @(posedge clk) begin
-    if (w_enable)
+    if (w_enable && w_address != 0)
       data[w_address] <= w_data;
   end
 endmodule
