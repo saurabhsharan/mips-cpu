@@ -6,7 +6,7 @@ VERILOG_SOURCES += $(RTL_DIR)/registers.v $(RTL_DIR)/cpu.v $(RTL_DIR)/alu.v $(RT
 
 all: $(PROJ).rpt $(PROJ).bin
 
-$(PROJ).json: $(VERILOG_SOURCES)
+$(PROJ).json: $(VERILOG_SOURCES) i1.mem
 	yosys -ql $(PROJ).yslog -p 'synth_ice40 -top icetop -json $@' $(VERILOG_SOURCES)
 
 $(PROJ).asc: $(PROJ).json icebreaker.pcf
@@ -33,6 +33,10 @@ $(PROJ)_syntb: $(PROJ)_tb.v $(PROJ)_syn.v
 $(PROJ)_syntb.vcd: $(PROJ)_syntb
 	vvp -N $< +vcd=$@
 
+i1.mem: mips_py/basic_mips.s
+	cd mips_py && python3 mips_assembler.py
+	cp mips_py/output.txt i1.mem
+
 prog: $(PROJ).bin
 	iceprog $<
 
@@ -43,6 +47,7 @@ sudo-prog: $(PROJ).bin
 clean:
 	rm -f $(PROJ).yslog $(PROJ).nplog $(PROJ).json $(PROJ).asc $(PROJ).rpt $(PROJ).bin
 	rm -f $(PROJ)_tb $(PROJ)_tb.vcd $(PROJ)_syn.v $(PROJ)_syntb $(PROJ)_syntb.vcd
+	rm -f i1.mem
 
 .SECONDARY:
 .PHONY: all prog clean

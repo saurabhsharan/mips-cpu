@@ -15,3 +15,6 @@ results.xml
 *.blif
 *.bin
 *.json
+
+i1.mem
+mips_py/output.txt

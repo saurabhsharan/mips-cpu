@@ -4,7 +4,7 @@ addi $t4, $t4, 255
 addi $t3, $t3, 16
 
 # $t0 stores current LED I/O register value, initialized to 1
-addi $t0, $zero, 2
+addi $t0, $zero, 1
 
 # On every loop iteration:
 # Set LED I/O register
