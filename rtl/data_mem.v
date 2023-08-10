@@ -2,6 +2,7 @@
 
 module data_mem (
   input wire clk,
+  input wire clk_enable,
   input wire [7:0]r_address,
   input wire [7:0]w_address,
   input wire [31:0]w_data,
@@ -19,7 +20,9 @@ module data_mem (
   assign o_data = data[r_address];
 
   always @(posedge clk) begin
-    if (w_enable)
-      data[w_address] <= w_data;
+    if (clk_enable) begin
+      if (w_enable)
+        data[w_address] <= w_data;
+    end
   end
 endmodule

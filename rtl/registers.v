@@ -5,6 +5,7 @@
 // * 2 read ports and 1 write port.
 module registers(
   input wire clk,
+  input wire clk_enable,
   input wire [4:0]r_address1,
   input wire [4:0]r_address2,
   input wire [4:0]w_address,
@@ -25,7 +26,9 @@ module registers(
   assign o_data2 = data[r_address2];
 
   always @(posedge clk) begin
-    if (w_enable && w_address != 0)
-      data[w_address] <= w_data;
+    if (clk_enable) begin
+      if (w_enable && w_address != 0)
+        data[w_address] <= w_data;
+    end
   end
 endmodule

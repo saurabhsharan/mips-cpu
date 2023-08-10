@@ -9,6 +9,7 @@ module top(
 
   cpu cpu(
     .clk (clk),
+    .clk_enable (1'b1),
     .mem_read_data (mem_read_data),
     .mem_read_address (mem_read_address),
     .mem_write_address (mem_write_address),
@@ -18,6 +19,7 @@ module top(
 
   data_mem dmem(
     .clk (clk),
+    .clk_enable (1'b1),
     .r_address (mem_read_address),
     .w_address (mem_write_address),
     .w_data (mem_write_data),

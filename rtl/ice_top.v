@@ -10,8 +10,16 @@ module icetop(
   wire [31:0] mem_write_data;
   wire mem_write_enable;
 
+  wire clk_enable;
+
+  clock_div cdiv(
+    .clk (CLK),
+    .clk_enable (clk_enable),
+  );
+
   cpu cpu(
     .clk (CLK),
+    .clk_enable (clk_enable),
     .mem_read_data (mem_read_data),
     .mem_read_address (mem_read_address),
     .mem_write_address (mem_write_address),
@@ -21,6 +29,7 @@ module icetop(
 
   icemem icem(
     .clk (CLK),
+    .clk_enable (clk_enable),
     .read_address (mem_read_address),
     .write_address (mem_write_address),
     .write_data (mem_write_data),

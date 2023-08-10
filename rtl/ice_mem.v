@@ -3,6 +3,7 @@
 // The last address (8'b11111111) is for I/O
 module icemem(
   input wire clk,
+  input wire clk_enable,
   input wire [7:0] read_address,
   input wire [7:0] write_address,
   input wire [31:0] write_data,
@@ -32,7 +33,9 @@ module icemem(
   assign LED5 = data[8'b11111111][4];
 
   always @(posedge clk) begin
-    if (write_enable)
-      data[write_address] <= write_data;
+    if (clk_enable) begin
+      if (write_enable)
+        data[write_address] <= write_data;
+    end
   end
 endmodule

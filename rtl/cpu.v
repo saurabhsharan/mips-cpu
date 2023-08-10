@@ -4,6 +4,7 @@
 
 module cpu(
   input wire clk, 
+  input wire clk_enable,
   input wire [31:0] mem_read_data,
   output wire [7:0] mem_read_address,
   output wire [7:0] mem_write_address,
@@ -16,12 +17,14 @@ module cpu(
     pc = 0;
   end
   always @(posedge clk) begin
-    if (is_branch && (alu_result == 0))
-      pc <= pc + 4 + (immediate * 4);
-    else if (is_jump)
-      pc <= (jump_imm_addr[7:0] << 2);
-    else
-      pc <= pc+4;
+    if (clk_enable) begin
+      if (is_branch && (alu_result == 0))
+        pc <= pc + 4 + (immediate * 4);
+      else if (is_jump)
+        pc <= (jump_imm_addr[7:0] << 2);
+      else
+        pc <= pc+4;
+    end
   end
 
   wire [31:0] instruction;
@@ -70,7 +73,7 @@ module cpu(
 
   wire [4:0] register_write_address = register_write_address_source ? d_register_addr : t_register_addr;
 
-  registers regs(.clk(clk),
+  registers regs(.clk(clk), .clk_enable(clk_enable),
                  .r_address1(s_register_addr), .r_address2(t_register_addr),
                  .w_address(register_write_address), .w_data(register_write_data), .w_enable(register_write_enable),
                  .o_data1(register_read_out1), .o_data2(register_read_out2));
