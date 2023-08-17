@@ -2,7 +2,7 @@
 
 `include "constants.vh"
 
-module mips_control (
+module single_cycle_mips_control (
   input wire [31:0]instruction,
   // these are marked `reg` so I can assign to them from an always @(*) block
   output reg register_write_data_source,

@@ -7,7 +7,7 @@ module top(
   wire [31:0] mem_write_data;
   wire mem_write_enable;
 
-  cpu cpu(
+  single_cycle_cpu cpu(
     .clk (clk),
     .clk_enable (1'b1),
     .mem_read_data (mem_read_data),

@@ -17,7 +17,7 @@ module icetop(
     .clk_enable (clk_enable),
   );
 
-  cpu cpu(
+  single_cycle_cpu cpu(
     .clk (CLK),
     .clk_enable (clk_enable),
     .mem_read_data (mem_read_data),

@@ -2,7 +2,7 @@
 
 `include "constants.vh"
 
-module cpu(
+module single_cycle_cpu(
   input wire clk, 
   input wire clk_enable,
   input wire [31:0] mem_read_data,
@@ -39,7 +39,7 @@ module cpu(
   wire [15:0] immediate;
   wire [4:0] shift_amt;
   wire [25:0] jump_imm_addr;
-  mips_control ctl(.instruction(instruction),
+  single_cycle_mips_control ctl(.instruction(instruction),
                    .register_write_data_source(register_write_data_source),
                    .register_write_enable(register_write_enable),
                    .register_write_address_source(register_write_address_source),
