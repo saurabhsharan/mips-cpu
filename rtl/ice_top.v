@@ -17,14 +17,14 @@ module icetop(
     .clk_enable (clk_enable),
   );
 
-  single_cycle_cpu cpu(
+  pipelined_cpu cpu(
     .clk (CLK),
     .clk_enable (clk_enable),
-    .mem_read_data (mem_read_data),
-    .mem_read_address (mem_read_address),
-    .mem_write_address (mem_write_address),
-    .mem_write_data (mem_write_data),
-    .mem_write_enable (mem_write_enable)
+    .i_mem_read_data (mem_read_data),
+    .o_mem_read_address (mem_read_address),
+    .o_mem_write_address (mem_write_address),
+    .o_mem_write_data (mem_write_data),
+    .o_mem_write_enable (mem_write_enable)
   );
 
   icemem icem(

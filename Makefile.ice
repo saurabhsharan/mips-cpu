@@ -2,7 +2,7 @@ PROJ = icetop
 
 RTL_DIR := $(PWD)/rtl
 
-VERILOG_SOURCES += $(RTL_DIR)/registers.v $(RTL_DIR)/single_cycle_cpu.v $(RTL_DIR)/alu.v $(RTL_DIR)/ice_mem.v $(RTL_DIR)/inst_mem.v $(RTL_DIR)/single_cycle_mips_control.v $(RTL_DIR)/ice_top.v $(RTL_DIR)/clock_div.v
+VERILOG_SOURCES += $(RTL_DIR)/registers.v $(RTL_DIR)/single_cycle_cpu.v $(RTL_DIR)/pipelined_cpu.v $(RTL_DIR)/alu.v $(RTL_DIR)/ice_mem.v $(RTL_DIR)/inst_mem.v $(RTL_DIR)/single_cycle_mips_control.v $(RTL_DIR)/pipelined_mips_control.v $(RTL_DIR)/ice_top.v $(RTL_DIR)/clock_div.v
 
 all: $(PROJ).rpt $(PROJ).bin
 

@@ -2,15 +2,15 @@ SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 RTL_DIR := $(PWD)/../rtl
 
-VERILOG_SOURCES += $(RTL_DIR)/registers.v $(RTL_DIR)/single_cycle_cpu.v $(RTL_DIR)/alu.v $(RTL_DIR)/data_mem.v $(RTL_DIR)/inst_mem.v $(RTL_DIR)/single_cycle_mips_control.v $(RTL_DIR)/top.v $(RTL_DIR)/constants.vh
+VERILOG_SOURCES += $(RTL_DIR)/registers.v $(RTL_DIR)/single_cycle_cpu.v $(RTL_DIR)/pipelined_cpu.v $(RTL_DIR)/alu.v $(RTL_DIR)/data_mem.v $(RTL_DIR)/inst_mem.v $(RTL_DIR)/single_cycle_mips_control.v $(RTL_DIR)/pipelined_mips_control.v $(RTL_DIR)/top.v $(RTL_DIR)/pipelined_top.v $(RTL_DIR)/constants.vh
 VERILOG_INCLUDE_DIRS += $(RTL_DIR)
 # use VHDL_SOURCES for VHDL files
 
 # TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
-TOPLEVEL = top
+TOPLEVEL = pipelined_top
 
 # MODULE is the basename of the Python test file
-MODULE = test_cpu
+MODULE = test_pipelined_cpu
 
 # include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim
