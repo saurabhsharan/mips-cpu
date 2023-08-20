@@ -1,11 +1,13 @@
 `default_nettype none
 
+`include "constants.vh"
+
 // ctrl signals from figure 5.14 in DD&CA2e by Harris
 module alu (
-  input wire [31:0]a,
-  input wire [31:0]b,
+  input wire [(`REGISTER_WIDTH-1):0]a,
+  input wire [(`REGISTER_WIDTH-1):0]b,
   input wire [2:0]ctrl,
-  output reg [31:0]result
+  output reg [(`REGISTER_WIDTH-1):0]result
 );
   always @(*) begin
     case (ctrl)

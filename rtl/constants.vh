@@ -1,11 +1,18 @@
 `ifndef _constants_vh_
 `define _constants_vh_
 
+// Note that the REGISTER_WIDTH is also assumed to be same as width for ALU inputs and outputs
 `define REGISTER_WIDTH 32
 `define REGISTER_WIDTH_RANGE = 31:0
 
 `define REGISTER_ADDR_WIDTH 5
 `define REGISTER_ADDR_WIDTH_RANGE = 4:0
+
+`define MEM_WORD_WIDTH 32
+
+`define MEM_ADDR_WIDTH 8
+
+`define INSTRUCTION_WIDTH 32
 
 `define MIPS_CONTROL_ALU_B_SOURCE__IMMEDIATE 2'b00
 `define MIPS_CONTROL_ALU_B_SOURCE__REGISTER_OUTPUT_2 2'b01

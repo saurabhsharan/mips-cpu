@@ -1,10 +1,12 @@
+`include "constants.vh"
+
 module pipelined_top(
   input wire clk
 );
-  wire [31:0] mem_read_data;
-  wire [7:0] mem_read_address;
-  wire [7:0] mem_write_address;
-  wire [31:0] mem_write_data;
+  wire [(`MEM_WORD_WIDTH-1):0] mem_read_data;
+  wire [(`MEM_ADDR_WIDTH-1):0] mem_read_address;
+  wire [(`MEM_ADDR_WIDTH-1):0] mem_write_address;
+  wire [(`MEM_WORD_WIDTH-1):0] mem_write_data;
   wire mem_write_enable;
 
   pipelined_cpu cpu(

@@ -1,20 +1,22 @@
 `default_nettype none
 
+`include "constants.vh"
+
 // 32 32-bit register file. 
 // * Async reads and sync writes.
 // * 2 read ports and 1 write port.
 module registers(
   input wire clk,
   input wire clk_enable,
-  input wire [4:0]r_address1,
-  input wire [4:0]r_address2,
-  input wire [4:0]w_address,
-  input wire [31:0]w_data,
+  input wire [(`REGISTER_ADDR_WIDTH-1):0]r_address1,
+  input wire [(`REGISTER_ADDR_WIDTH-1):0]r_address2,
+  input wire [(`REGISTER_ADDR_WIDTH-1):0]w_address,
+  input wire [(`REGISTER_WIDTH-1):0]w_data,
   input wire w_enable,
-  output wire [31:0]o_data1,
-  output wire [31:0]o_data2);
+  output wire [(`REGISTER_WIDTH-1):0]o_data1,
+  output wire [(`REGISTER_WIDTH-1):0]o_data2);
 
-  reg [31:0] data[0:31];
+  reg [(`REGISTER_WIDTH-1):0] data[0:31];
 
   integer i;
   initial begin

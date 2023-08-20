@@ -5,14 +5,14 @@
 module pipelined_cpu(
   input wire clk, 
   input wire clk_enable,
-  input wire [31:0] i_mem_read_data,
-  output wire [7:0] o_mem_read_address,
-  output wire [7:0] o_mem_write_address,
-  output wire [31:0] o_mem_write_data,
+  input wire [(`MEM_WORD_WIDTH-1):0] i_mem_read_data,
+  output wire [(`MEM_ADDR_WIDTH-1):0] o_mem_read_address,
+  output wire [(`MEM_ADDR_WIDTH-1):0] o_mem_write_address,
+  output wire [(`MEM_WORD_WIDTH-1):0] o_mem_write_data,
   output wire o_mem_write_enable
 );
   // Main CPU program counter
-  reg [7:0]pc;
+  reg [(`MEM_ADDR_WIDTH-1):0]pc;
   reg r_pc_valid;
   initial begin
     pc = 0;
@@ -30,7 +30,7 @@ module pipelined_cpu(
   // Stage 1: Instruction Fetch
 
   // Define output registers for this stage
-  reg [31:0] r_instruction_q1;
+  reg [(`INSTRUCTION_WIDTH-1):0] r_instruction_q1;
   reg r_q1_valid;
   initial begin
     r_instruction_q1 = 0;
@@ -38,7 +38,7 @@ module pipelined_cpu(
   end
 
   // Perform (asynchronous) instruction fetch from instruction memory
-  wire [31:0] w_imem_instruction;
+  wire [(`INSTRUCTION_WIDTH-1):0] w_imem_instruction;
   inst_mem imem(.i_address(pc), .instruction(w_imem_instruction));
 
   // Write to pipeline stage output registers
@@ -83,8 +83,8 @@ module pipelined_cpu(
   // TODO: change this to just `assign` and infer the wire width
   wire [`REGISTER_ADDR_WIDTH-1:0] w_s_reg_addr = w_control_signals[`MIPS_CONTROL_SIGNALS_S_REGISTER_ADDR_BITS];
   wire [`REGISTER_ADDR_WIDTH-1:0] w_t_reg_addr = w_control_signals[`MIPS_CONTROL_SIGNALS_T_REGISTER_ADDR_BITS];
-  wire [31:0] w_reg1_readout;
-  wire [31:0] w_reg2_readout;
+  wire [(`REGISTER_WIDTH-1):0] w_reg1_readout;
+  wire [(`REGISTER_WIDTH-1):0] w_reg2_readout;
   // Note that we can't just decide whether to enable/disable the entire register file based on r_q1_valid since the 5th stage might be writing to register file even if no read from immediate previous stage output
   registers regs(.clk(clk), .clk_enable(clk_enable),
                  .r_address1(w_s_reg_addr), .r_address2(w_t_reg_addr),
@@ -111,7 +111,7 @@ module pipelined_cpu(
 
   // Define output registers for this stage
   reg r_q3_valid;
-  reg [31:0] r_alu_result_q3;
+  reg [(`REGISTER_WIDTH-1):0] r_alu_result_q3;
   reg [(`MIPS_CONTROL_SIGNALS_WIDTH-1):0] r_control_signals_q3;
   reg [`REGISTER_WIDTH-1:0] r_reg1_readout_q3;
   reg [`REGISTER_WIDTH-1:0] r_reg2_readout_q3;
@@ -121,7 +121,7 @@ module pipelined_cpu(
   wire [2:0] w_alu_ctrl = r_control_signals_q2[`MIPS_CONTROL_SIGNALS_ALU_CTRL_BITS];
 
   // Use control signals to determine alu b input
-  reg [31:0] r_alu_b_input;
+  reg [(`REGISTER_WIDTH-1):0] r_alu_b_input;
   always @(*) begin
     case (w_alu_b_source)
       `MIPS_CONTROL_ALU_B_SOURCE__IMMEDIATE: r_alu_b_input = {16'h0000, r_immediate_q2};
@@ -132,7 +132,7 @@ module pipelined_cpu(
   end
 
   // Perform ALU operation
-  wire [31:0] w_alu_result;
+  wire [(`REGISTER_WIDTH-1):0] w_alu_result;
   alu alu(.a(r_reg1_readout_q2), .b(r_alu_b_input), .ctrl(w_alu_ctrl), .result(w_alu_result));
 
   // Write to pipeline stage output registers
@@ -158,8 +158,8 @@ module pipelined_cpu(
   // Define output registers for this stage
   reg r_q4_valid;
   reg [(`MIPS_CONTROL_SIGNALS_WIDTH-1):0] r_control_signals_q4;
-  reg [31:0] r_alu_result_q4;
-  reg [31:0] r_data_mem_readout_q4;
+  reg [(`REGISTER_WIDTH-1):0] r_alu_result_q4;
+  reg [(`MEM_WORD_WIDTH-1):0] r_data_mem_readout_q4;
   reg [`REGISTER_WIDTH-1:0] r_reg1_readout_q4;
   reg [`REGISTER_WIDTH-1:0] r_reg2_readout_q4;
   initial begin
