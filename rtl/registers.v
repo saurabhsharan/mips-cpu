@@ -19,7 +19,7 @@ module registers(
   integer i;
   initial begin
     for (i=0; i<32; i=i+1)
-      data[i] <= 0;
+      data[i] = 0;
   end
 
   assign o_data1 = data[r_address1];

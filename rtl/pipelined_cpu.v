@@ -9,8 +9,7 @@ module pipelined_cpu(
   output wire [7:0] o_mem_read_address,
   output wire [7:0] o_mem_write_address,
   output wire [31:0] o_mem_write_data,
-  output wire o_mem_write_enable,
-  output wire [7:0] pc_out
+  output wire o_mem_write_enable
 );
   // Main CPU program counter
   reg [7:0]pc;
@@ -125,10 +124,10 @@ module pipelined_cpu(
   reg [31:0] r_alu_b_input;
   always @(*) begin
     case (w_alu_b_source)
-      `MIPS_CONTROL_ALU_B_SOURCE__IMMEDIATE: r_alu_b_input = r_immediate_q2;
+      `MIPS_CONTROL_ALU_B_SOURCE__IMMEDIATE: r_alu_b_input = {16'h0000, r_immediate_q2};
       `MIPS_CONTROL_ALU_B_SOURCE__REGISTER_OUTPUT_2: r_alu_b_input = r_reg2_readout_q2;
-      `MIPS_CONTROL_ALU_B_SOURCE__SHIFT_IMMEDIATE: r_alu_b_input = r_immediate_q2;
-      default: r_alu_b_input = r_immediate_q2;
+      `MIPS_CONTROL_ALU_B_SOURCE__SHIFT_IMMEDIATE: r_alu_b_input = {16'h0000, r_immediate_q2};
+      default: r_alu_b_input = {16'h0000, r_immediate_q2};
     endcase
   end
 
@@ -160,7 +159,7 @@ module pipelined_cpu(
   reg r_q4_valid;
   reg [(`MIPS_CONTROL_SIGNALS_WIDTH-1):0] r_control_signals_q4;
   reg [31:0] r_alu_result_q4;
-  reg r_data_mem_readout_q4;
+  reg [31:0] r_data_mem_readout_q4;
   reg [`REGISTER_WIDTH-1:0] r_reg1_readout_q4;
   reg [`REGISTER_WIDTH-1:0] r_reg2_readout_q4;
   initial begin
@@ -168,8 +167,8 @@ module pipelined_cpu(
   end
 
   // Assign correct values to external data memory pins
-  assign o_mem_read_address = r_reg1_readout_q3;
-  assign o_mem_write_address = r_reg1_readout_q3;
+  assign o_mem_read_address = r_reg1_readout_q3[7:0];
+  assign o_mem_write_address = r_reg1_readout_q3[7:0];
   assign o_mem_write_data = r_reg2_readout_q3;
   assign o_mem_write_enable = r_control_signals_q3[`MIPS_CONTROL_SIGNALS_DATA_MEM_WRITE_ENABLE_BITS] && r_q3_valid;
 

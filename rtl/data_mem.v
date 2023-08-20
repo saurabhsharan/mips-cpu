@@ -14,7 +14,7 @@ module data_mem (
   integer i;
   initial begin
     for (i=0; i<256; i=i+1)
-      data[i] <= 0;
+      data[i] = 0;
   end
 
   assign o_data = data[r_address];

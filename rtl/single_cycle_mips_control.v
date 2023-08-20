@@ -39,6 +39,8 @@ module single_cycle_mips_control (
 
     jump_imm_addr = instruction[25:0];
 
+    /* verilator lint_off CASEINCOMPLETE */
+    // OK to have incomplete case statements since we already assigned the defaults above
     case (instruction[31:26])
       // R-format
       6'b000000: begin
@@ -100,5 +102,6 @@ module single_cycle_mips_control (
         is_jump = 1;
       end
     endcase
+    /* verilator lint_on CASEINCOMPLETE */
   end
 endmodule
