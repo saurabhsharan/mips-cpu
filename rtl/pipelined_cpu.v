@@ -24,6 +24,9 @@ module pipelined_cpu(
   wire w_register_write_enable;
   wire [`REGISTER_WIDTH-1:0] w_register_write_data;
   wire [`REGISTER_ADDR_WIDTH-1:0] w_register_write_addr;
+  // Wire to carry information about jump from stage 2 to stage 1
+  wire is_jump;
+  wire [25:0] jump_imm_addr;
 
 
 
@@ -49,6 +52,10 @@ module pipelined_cpu(
         // Note how r_q1_valid is effectively a shift register following r_pc_valid, which makes sense since r_pc_valid tells us whether the current program counter *input* is valid, which then needs to be forwarded so the next stage knows the instruction *output* is valid
         r_q1_valid <= 1;
         r_pc_valid <= 0;
+      end else if (is_jump) begin
+        r_q1_valid <= 0;
+        r_pc_valid <= 1;
+        pc <= (jump_imm_addr[7:0] << 2);
       end else if (r_q4_valid) begin
         r_q1_valid <= 0;
         r_pc_valid <= 1;
@@ -79,6 +86,9 @@ module pipelined_cpu(
   pipelined_mips_control mips_ctrl(.i_instruction(r_instruction_q1), 
                                    .o_control_signals(w_control_signals));
 
+  assign is_jump = r_q1_valid && w_control_signals[`MIPS_CONTROL_SIGNALS_IS_JUMP_BITS];
+  assign jump_imm_addr = r_instruction_q1[25:0];
+
   // Perform register read
   // TODO: change this to just `assign` and infer the wire width
   wire [`REGISTER_ADDR_WIDTH-1:0] w_s_reg_addr = w_control_signals[`MIPS_CONTROL_SIGNALS_S_REGISTER_ADDR_BITS];
@@ -101,7 +111,8 @@ module pipelined_cpu(
         r_control_signals_q2 <= w_control_signals;
       end
 
-      r_q2_valid <= r_q1_valid;
+      // Only mark the next stage for execution if this (a) wasn't a jump instruction and (b) the previous stage was also valid
+      r_q2_valid <= !is_jump && r_q1_valid;
     end
   end
 

@@ -95,3 +95,47 @@ async def pipelined_cpu_basic_test(dut):
   assert dut.cpu.regs.data.value[REGISTER_INDEXES['t0']].signed_integer == 3
   assert dut.cpu.regs.data.value[REGISTER_INDEXES['t1']].signed_integer == 6
   assert dut.cpu.regs.data.value[REGISTER_INDEXES['t2']].signed_integer == -3
+
+@cocotb.test()
+async def pipelined_cpu_jump_test(dut):
+  assembler = MIPSAssembler()
+  instructions = assembler.assemble([
+    ['addi', '$t0', '$t0', '1'],
+    ['addi', '$t0', '$t0', '2'],
+    ['j', '1'],
+  ])
+  await Timer(1)
+  await load_program(dut, instructions)
+
+  await tick(dut) # execute stage 1
+  await tick(dut) # execute stage 2
+  await tick(dut) # execute stage 3
+  await tick(dut) # execute stage 4
+  await tick(dut) # execute stage 5
+
+  assert dut.cpu.pc.value == 4
+
+  await tick(dut) # execute stage 1
+  await tick(dut) # execute stage 2
+  await tick(dut) # execute stage 3
+  await tick(dut) # execute stage 4
+  await tick(dut) # execute stage 5
+
+  assert dut.cpu.pc.value == 8
+
+  await tick(dut) # execute stage 1
+
+  assert dut.cpu.r_q1_valid.value == 1
+  assert dut.cpu.is_jump.value == 1
+
+  await tick(dut) # execute stage 2
+
+  assert dut.cpu.pc.value == 4
+
+  await tick(dut) # execute stage 1
+  await tick(dut) # execute stage 2
+  await tick(dut) # execute stage 3
+  await tick(dut) # execute stage 4
+  await tick(dut) # execute stage 5
+
+  assert dut.cpu.regs.data.value[REGISTER_INDEXES['t0']] == 5
